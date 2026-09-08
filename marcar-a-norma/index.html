@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Conversor de Norma Cu$ta — Cucalimguistica</title>
+  <meta name="description" content="Marque pontos do texto com # e converta-os em sinais críticos da norma-padrão." />
+  <style>
+    :root {
+      --bg: #f5f4ef;
+      --panel: #ffffff;
+      --text: #191919;
+      --muted: #686868;
+      --line: #d8d6cf;
+      --accent: #111111;
+      --soft: #efede6;
+      --radius: 18px;
+      --shadow: 0 8px 28px rgba(0,0,0,.06);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+                   "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+    }
+    .wrap { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 38px 0 64px; }
+    header { margin-bottom: 24px; }
+    .eyebrow { font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    h1 { margin: 0 0 10px; font-size: clamp(2rem, 5vw, 4rem); line-height: .98; letter-spacing: -.04em; font-weight: 800; }
+    .intro { max-width: 820px; color: var(--muted); font-size: 1.05rem; margin: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 26px; }
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    .panel-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 16px 18px; border-bottom: 1px solid var(--line); background: #fbfaf7; }
+    .panel-head h2 { margin: 0; font-size: 1rem; font-weight: 700; }
+    .count { font-size: .82rem; color: var(--muted); white-space: nowrap; }
+    textarea { display: block; width: 100%; min-height: 420px; resize: vertical; border: 0; outline: 0; padding: 20px; background: transparent; color: var(--text); font: 1rem/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+    textarea::placeholder { color: #aaa69c; }
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 18px 0; }
+    button, select { font: inherit; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--text); }
+    button { cursor: pointer; padding: 11px 16px; font-weight: 700; transition: transform .08s ease, background .15s ease; }
+    button:hover { background: var(--soft); }
+    button:active { transform: translateY(1px); }
+    button.primary { background: var(--accent); color: white; border-color: var(--accent); }
+    button.primary:hover { background: #2a2a2a; }
+    select { padding: 10px 36px 10px 14px; font-weight: 600; }
+    .spacer { flex: 1 1 auto; }
+    .status { min-height: 24px; font-size: .9rem; color: var(--muted); margin-top: -4px; margin-bottom: 14px; }
+    .legend { margin-top: 22px; display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+    .legend-item { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 15px; }
+    .legend-symbol { font-size: 1.55rem; margin-bottom: 4px; }
+    .legend-title { font-weight: 750; margin-bottom: 2px; }
+    .legend-desc { color: var(--muted); font-size: .9rem; }
+
+    .flag-mode-wrap { display: inline-flex; align-items: center; gap: 8px; }
+    .rich-output {
+      display: block; width: 100%; min-height: 420px; resize: vertical; overflow: auto;
+      border: 0; outline: 0; padding: 20px; background: transparent; color: var(--text);
+      font: 1rem/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      white-space: pre-wrap; overflow-wrap: anywhere;
+    }
+    .rich-output:empty::before { content: attr(data-placeholder); color: #aaa69c; }
+    .inline-flag { width: 1.45em; height: .97em; object-fit: fill; vertical-align: -.11em; margin: 0 .03em; border-radius: .08em; box-shadow: 0 0 0 1px rgba(0,0,0,.08); }
+    .legend-symbol .inline-flag { width: 1.55em; height: 1.03em; vertical-align: -.08em; }
+
+    details { margin-top: 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+    summary { cursor: pointer; font-weight: 700; }
+    .note { color: var(--muted); font-size: .92rem; margin: 10px 0 0; }
+    code { background: var(--soft); border-radius: 6px; padding: 2px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    footer { margin-top: 26px; color: var(--muted); font-size: .84rem; }
+    @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } .legend { grid-template-columns: 1fr 1fr; } textarea, .rich-output { min-height: 300px; } }
+    @media (max-width: 520px) { .wrap { width: min(100% - 20px, 1120px); padding-top: 24px; } .legend { grid-template-columns: 1fr; } .controls { align-items: stretch; } button, select { width: 100%; } .spacer { display: none; } }
+  .ein-nav{margin-bottom:20px}.ein-nav a{color:var(--muted);text-decoration:none;font-weight:750}.ein-nav a:hover{color:var(--text)}
+.concept{margin-top:54px;border-top:1px solid var(--line);padding-top:22px}.concept h2{font-size:clamp(1.8rem,4vw,3rem);letter-spacing:-.04em;margin:0 0 20px}.concept .prose{max-width:840px}.concept .prose p{margin:0 0 1.2em}.concept .prose em{font-family:Georgia,serif}
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <nav class="ein-nav" aria-label="Navegação EIN"><a href="../index.html">← EIN</a></nav>
+    <header>
+      <div class="eyebrow">Cucalimguistica · intervenção metalinguística</div>
+      <h1>Conversor de Norma Cu$ta</h1>
+      <p class="intro">
+        Insira <code>#</code> imediatamente após um ponto do texto em que🚨💰 a norma-padrão deve deixar de passar despercebida.
+        O conversor substituirá🦖 cada marcador por uma combinação variável de sinais críticos.
+      </p>
+    </header>
+
+    <section class="controls" aria-label="Controles">
+      <button class="primary" id="convertBtn">Converter</button>
+      <button id="rerollBtn">Nova variação</button>
+      <button id="copyBtn">Copiar resultado</button>
+      <div class="spacer"></div>
+      <label for="intensity"><strong>Intensidade</strong></label>
+      <select id="intensity">
+        <option value="discreto">Discreto</option>
+        <option value="normal" selected>Normal</option>
+        <option value="saturado">Saturado</option>
+      </select>
+      <span class="flag-mode-wrap">
+        <label for="flagMode"><strong>Bandeiras</strong></label>
+        <select id="flagMode">
+          <option value="emoji">Emoji</option>
+          <option value="grafica">Gráficas</option>
+        </select>
+      </span>
+    </section>
+
+    <div class="status" id="status" aria-live="polite"></div>
+
+    <section class="grid">
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Texto com marcadores</h2>
+          <span class="count" id="sourceCount">0 marcadores</span>
+        </div>
+        <textarea id="source" spellcheck="true" placeholder="Exemplo:\n\nO autor interveio# na discussão.\nO livro cuja# capa é azul será analisado.\nPoder-se-ia# dizer que..."></textarea>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Texto marcado</h2>
+          <span class="count" id="outputCount">0 intervenções</span>
+        </div>
+        <div id="output" class="rich-output" role="textbox" aria-readonly="true" data-placeholder="O resultado aparecerá aqui."></div>
+      </article>
+    </section>
+
+    <section class="legend" aria-label="Legenda">
+      <div class="legend-item"><div class="legend-symbol flag-preview" data-flag="🇵🇹">🇵🇹</div><div class="legend-title">Herança portuguesa</div><div class="legend-desc">Torna visível a genealogia portuguesa da norma-padrão brasileira.</div></div>
+      <div class="legend-item"><div class="legend-symbol">🦖</div><div class="legend-title">Preservação / museu</div><div class="legend-desc">Marca preservação, fossilização ou conservação normativa.</div></div>
+      <div class="legend-item"><div class="legend-symbol">🫡</div><div class="legend-title">Conformidade</div><div class="legend-desc">Expõe a forma fornecida porque é a forma esperada ou prescrita.</div></div>
+      <div class="legend-item"><div class="legend-symbol">💰</div><div class="legend-title">Custo</div><div class="legend-desc">Aponta para custos de aquisição, escolarização, acesso e capital linguístico.</div></div>
+      <div class="legend-item"><div class="legend-symbol">🚨</div><div class="legend-title">Vigilância</div><div class="legend-desc">Marca pontos em que correção, fiscalização ou policiamento se tornam ativos.</div></div>
+      <div class="legend-item"><div class="legend-symbol">🏅</div><div class="legend-title">Prestígio / recompensa</div><div class="legend-desc">Expõe a recompensa simbólica atribuída ao domínio da forma autorizada.</div></div>
+    </section>
+
+    <details>
+      <summary>Como usar</summary>
+      <p class="note">Escreva normalmente e coloque <code>#</code> apenas onde quiser tornar a normatividade visível. Ex.: <code>interveio#</code>, <code>cuja#</code>, <code>analisaram-se# os dados</code>. Para manter um caractere <code>#</code> literal, escreva <code>\#</code>.</p>
+      <p class="note">O autor escolhe <em>onde</em> intervir; o conversor escolhe <em>como</em> cada intervenção aparece. As combinações são ponderadas: uma ou duas marcas são mais frequentes; três são menos comuns; quatro ou mais aparecem raramente, conforme a intensidade selecionada.</p>
+      <p class="note">O processamento é feito integralmente no navegador. O texto não é enviado para nenhum servidor.</p><p class="note">Em <strong>Bandeiras: Gráficas</strong>, a página mostra uma imagem hospedada da bandeira e o botão <strong>Copiar resultado</strong> tenta copiar HTML rico para preservar a bandeira como imagem ao colar em editores compatíveis. Também é incluída uma versão em texto Unicode como alternativa.</p>
+    </details>
+
+
+    <section class="concept" id="sobre"><h2>Marcar a norma</h2><div class="prose">
+<p>A língua-padrão costuma entrar no texto acadêmico sem se identificar. Suas formas aparecem simplesmente como a maneira adequada, correta ou esperada de escrever, enquanto as alternativas são marcadas como informais, inadequadas, erradas ou impróprias. Esta intervenção inverte essa relação. Em vez de marcar apenas aquilo que se afasta do padrão, ela coloca sinais em construções-padrão💰🏅 selecionadas, a fim de tornar visíveis dimensões que sua apresentação como meramente “corretas” normalmente oculta. Uma mesóclise pode carregar uma herança histórica portuguesa; uma construção prescrita pode aparecer como algo preservado, aprendido por conformidade, adquirido a determinado custo, submetido à🫡🚨 vigilância da correção ou recompensado como demonstração de competência linguística. A forma-padrão permanece ali, mas deixa de passar despercebida.</p>
+<p>A intervenção não propõe uma nova classificação gramatical, nem afirma que toda forma marcada possui um significado social fixo. Uma mesma construção pode receber marcas diferentes em ocorrências diferentes, várias marcas simultaneamente ou nenhuma. Herança portuguesa, preservação, conformidade, custo, vigilância e prestígio se sobrepõem histórica e socialmente; tentar distribuir permanentemente cada construção entre essas categorias significaria reproduzir, sob outra forma, a rigidez classificatória que se pretende questionar. As marcas, portanto, não classificam exaustivamente as formas linguísticas. Elas expõem, de maneira intermitente, dimensões da normatividade que se tornam relevantes em determinados pontos de um texto. Não marcamos tudo aquilo que é padrão: marcamos momentos em que o caráter padrão importa.</p>
+<p>Isso significa também que a intervenção é deliberadamente seletiva e parcialmente instável. Até mesmo uma forma aparentemente comum, como uma marca de plural, pode tornar-se passível de marcação quando sua realização padrão estiver sendo contraposta a uma alternativa socialmente estigmatizada; em outro contexto, a mesma forma pode aparecer sem qualquer intervenção. Do mesmo modo, construções como “para eu fazer🫡🇵🇹🦖”, “de quem eu gosto🦖🚨”, “analisaram-se🇵🇹🦖🚨💰🏅 os dados” ou uma regência verbal prescrita podem tornar-se visíveis não porque constituam uma classe linguística homogênea, mas porque sua presença evoca alternativas que foram corrigidas, excluídas ou socialmente hierarquizadas. A forma presente pode, assim, carregar consigo🇵🇹 uma contraparte ausente. A marca interrompe a aparente neutralidade do padrão e restitui a existência da escolha, do conflito e da história.</p>
+<p>Essa prática não deve ser entendida como uma tentativa de substituir a descrição linguística por símbolos, de demonstrar que determinadas construções são intrinsecamente boas ou ruins ou de estabelecer outro código normativo que determine qual sinal cada expressão deve receber. Tampouco💰💰 a marcação de uma construção demonstra que ninguém a🇵🇹🇵🇹 utilize espontaneamente, que ela pertença exclusivamente a Portugal ou que toda ocorrência resulte de coerção consciente. Essas são precisamente algumas das questões que a intervenção mantém em aberto. Seus sinais funcionam como dispositivos críticos e performativos, não como instrumentos de medição empírica. Seu objetivo não é resolver antecipadamente o debate linguístico, mas impedir que um dos lados desse debate — a forma padronizada — entre no texto como se não possuísse história social alguma.</p>
+<p>No texto acadêmico, isso produz uma forma deliberadamente intermediária de dissenso linguístico. O autor pode continuar empregando a construção institucionalmente esperada e, ao mesmo tempo, recusar-se a apresentar essa conformidade como neutra. Formas como “interveio🏅🚨”, “cujo🇵🇹🦖”, “dar-se-á🇵🇹🦖💰🏅” ou uma ocorrência de crase continuam atendendo às🫡🫡 exigências reconhecíveis da escrita padronizada, mas o sinal acrescentado interfere no significado convencionalmente associado a essa conformidade. A intervenção atua, portanto, de dentro do texto padronizado: ela não precisa substituir a forma autorizada; torna a própria autorização visível.</p>
+<p>Seu objetivo mais amplo é redistribuir quem recebe marcas. Durante muito tempo, a diferença linguística foi tornada conspícua🏅💰, enquanto a língua padronizada ocupou a posição privilegiada de parecer não marcada. Aqui, a operação se inverte. O padrão é chamado a apresentar seus documentos: sua história, seus mecanismos de preservação, seus custos de aquisição, suas formas de vigilância, suas exigências de conformidade e seus sistemas de recompensa. As marcas não precisam concordar sempre entre si, comportar-se🇵🇹 de maneira perfeitamente regular ou permanecer associadas às🚨🚨 mesmas construções. Precisam apenas interromper a ilusão de que as formas “corretas” chegam ao texto sem nenhuma bagagem.</p>
+<p>Esses sinais ficam, assim, disponíveis para circulação, alteração e reutilização. Podem entrar em textos acadêmicos, materiais de aula, redes sociais, anotações, performances e outras formas de escrita; novos sinais podem ser introduzidos, e os já existentes podem assumir diferentes combinações e ênfases. Sua circulação importa mais do que a propriedade de um código definitivo. Coloquem sinais nos signos. Tornem o padrão visível. Deixem suas formas continuar circulando — mas não mais anonimamente.</p>
+</div></section>
+    <footer>A marca não classifica a forma de modo exaustivo: ela expõe, de modo intermitente, dimensões normalmente ocultadas por sua apresentação como simplesmente “correta”.</footer>
+  </main>
+
+  <script>
+    const source = document.getElementById("source");
+    const output = document.getElementById("output");
+    const intensity = document.getElementById("intensity");
+    const flagMode = document.getElementById("flagMode");
+    const statusEl = document.getElementById("status");
+    const sourceCount = document.getElementById("sourceCount");
+    const outputCount = document.getElementById("outputCount");
+
+    const FLAG_UNICODE = '🇵🇹';
+    const FLAG_URI = new URL('../assets/flags/portugal.png', window.location.href).href;
+    const FLAG_NAME = 'Bandeira de Portugal';
+
+    const marks = [
+      { value: "🇵🇹", weight: 0.85 },
+      { value: "🦖", weight: 0.90 },
+      { value: "🫡", weight: 1.25 },
+      { value: "💰", weight: 1.30 },
+      { value: "🚨", weight: 1.20 },
+      { value: "🏅", weight: 1.10 }
+    ];
+
+    const sizeProfiles = {
+      discreto: [[1, 0.76], [2, 0.21], [3, 0.03]],
+      normal: [[1, 0.52], [2, 0.30], [3, 0.13], [4, 0.04], [5, 0.01]],
+      saturado: [[1, 0.25], [2, 0.31], [3, 0.23], [4, 0.13], [5, 0.06], [6, 0.02]]
+    };
+
+    let lastPlainText = "";
+
+    function weightedPick(items) {
+      const total = items.reduce((sum, item) => sum + item.weight, 0);
+      let r = Math.random() * total;
+      for (const item of items) {
+        r -= item.weight;
+        if (r <= 0) return item.value;
+      }
+      return items[items.length - 1].value;
+    }
+
+    function chooseClusterSize(profileName) {
+      const profile = sizeProfiles[profileName];
+      let r = Math.random();
+      for (const [size, probability] of profile) {
+        r -= probability;
+        if (r <= 0) return size;
+      }
+      return profile[profile.length - 1][0];
+    }
+
+    function makeCluster(profileName) {
+      const size = chooseClusterSize(profileName);
+      const available = [...marks];
+      const chosen = [];
+      while (chosen.length < size && available.length) {
+        const picked = weightedPick(available);
+        chosen.push(picked);
+        const idx = available.findIndex(item => item.value === picked);
+        if (idx >= 0) available.splice(idx, 1);
+      }
+      for (let i = chosen.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [chosen[i], chosen[j]] = [chosen[j], chosen[i]];
+      }
+      return chosen.join("");
+    }
+
+    function countMarkers(text) {
+      let count = 0;
+      for (let i = 0; i < text.length; i++) {
+        if (text[i] === "\\" && text[i + 1] === "#") { i++; continue; }
+        if (text[i] === "#") count++;
+      }
+      return count;
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+      })[ch]);
+    }
+
+    function richHtmlFromPlain(text) {
+      const escaped = escapeHtml(text).replace(/\n/g, '<br>');
+      if (flagMode.value !== 'grafica') return escaped;
+      const img = `<img src="${FLAG_URI}" alt="${FLAG_NAME}" title="${FLAG_NAME}" width="22" height="15" style="width:22px;height:15px;vertical-align:-2px;margin:0 1px;border:0;display:inline-block;">`;
+      return escaped.split(FLAG_UNICODE).join(img);
+    }
+
+    function refreshOutputView() {
+      output.innerHTML = lastPlainText ? richHtmlFromPlain(lastPlainText) : '';
+      document.querySelectorAll('.flag-preview').forEach(el => {
+        if (flagMode.value === 'grafica') {
+          el.innerHTML = `<img class="inline-flag" src="${FLAG_URI}" alt="${FLAG_NAME}" title="${FLAG_NAME}">`;
+        } else {
+          el.textContent = FLAG_UNICODE;
+        }
+      });
+    }
+
+    function convertText() {
+      const text = source.value;
+      const profile = intensity.value;
+      let result = "";
+      let interventions = 0;
+      for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (ch === "\\" && text[i + 1] === "#") {
+          result += "#";
+          i++;
+          continue;
+        }
+        if (ch === "#") {
+          result += makeCluster(profile);
+          interventions++;
+        } else {
+          result += ch;
+        }
+      }
+      lastPlainText = result;
+      refreshOutputView();
+      outputCount.textContent = `${interventions} ${interventions === 1 ? "intervenção" : "intervenções"}`;
+      statusEl.textContent = interventions
+        ? `Conversão concluída: ${interventions} ${interventions === 1 ? "ponto marcado" : "pontos marcados"}.`
+        : "Nenhum marcador # foi encontrado.";
+    }
+
+    function updateSourceCount() {
+      const n = countMarkers(source.value);
+      sourceCount.textContent = `${n} ${n === 1 ? "marcador" : "marcadores"}`;
+    }
+
+    async function copyOutput() {
+      if (!lastPlainText) { statusEl.textContent = "Ainda não há resultado para copiar."; return; }
+
+      if (flagMode.value === 'grafica' && navigator.clipboard && window.ClipboardItem) {
+        try {
+          const bodyHtml = richHtmlFromPlain(lastPlainText);
+          const html = `<div style="white-space:pre-wrap;font-family:Arial,sans-serif;line-height:1.5">${bodyHtml}</div>`;
+          const item = new ClipboardItem({
+            'text/html': new Blob([html], { type: 'text/html' }),
+            'text/plain': new Blob([lastPlainText], { type: 'text/plain' })
+          });
+          await navigator.clipboard.write([item]);
+          statusEl.textContent = "Resultado copiado com bandeira gráfica (e versão Unicode de segurança).";
+          return;
+        } catch (err) {
+          console.warn('Falha na cópia rica; usando texto Unicode.', err);
+        }
+      }
+
+      try {
+        await navigator.clipboard.writeText(lastPlainText);
+        statusEl.textContent = flagMode.value === 'grafica'
+          ? "O navegador não permitiu a cópia gráfica; foi copiada a versão Unicode."
+          : "Resultado copiado.";
+      } catch (err) {
+        const tmp = document.createElement('textarea');
+        tmp.value = lastPlainText;
+        tmp.style.position = 'fixed'; tmp.style.opacity = '0';
+        document.body.appendChild(tmp); tmp.select(); document.execCommand('copy'); tmp.remove();
+        statusEl.textContent = "Resultado copiado em texto Unicode.";
+      }
+    }
+
+    document.getElementById("convertBtn").addEventListener("click", convertText);
+    document.getElementById("rerollBtn").addEventListener("click", () => {
+      if (countMarkers(source.value) === 0) { statusEl.textContent = "Insira pelo menos um marcador # antes de gerar uma nova variação."; return; }
+      convertText(); statusEl.textContent = "Nova variação gerada.";
+    });
+    document.getElementById("copyBtn").addEventListener("click", copyOutput);
+    flagMode.addEventListener('change', () => {
+      refreshOutputView();
+      statusEl.textContent = flagMode.value === 'grafica'
+        ? "Modo gráfico ativado: a cópia tentará preservar a bandeira como imagem."
+        : "Modo emoji ativado: máxima portabilidade em texto Unicode.";
+    });
+    source.addEventListener("input", updateSourceCount);
+    source.addEventListener("keydown", (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === "Enter") { event.preventDefault(); convertText(); }
+    });
+    updateSourceCount();
+    refreshOutputView();
+  </script>
+</body>
+</html>
