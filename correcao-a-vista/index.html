@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Correção à Vista — EIN · Cucalimguistica</title>
+  <meta name="description" content="Torne visível o trabalho da correção: o que é retirado permanece tachado; o que é imposto entra em vermelho, negrito e maiúsculas." />
+  <style>
+    :root {
+      --bg:#f5f4ef; --panel:#ffffff; --text:#191919; --muted:#686868;
+      --line:#d8d6cf; --accent:#111111; --soft:#efede6; --red:#c1121f;
+      --radius:18px; --shadow:0 8px 28px rgba(0,0,0,.06);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text)}
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+    .wrap{width:min(1120px,calc(100% - 32px));margin:0 auto;padding:38px 0 64px}
+    .ein-nav{margin-bottom:20px}.ein-nav a{color:var(--muted);text-decoration:none;font-weight:750}.ein-nav a:hover{color:var(--text)}
+    header{margin-bottom:24px}.eyebrow{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+    h1{margin:0 0 10px;font-size:clamp(2rem,5vw,4rem);line-height:.98;letter-spacing:-.04em;font-weight:800}
+    .intro{max-width:850px;color:var(--muted);font-size:1.05rem;margin:0}
+    .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:18px 0}
+    button{font:inherit;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--text);cursor:pointer;padding:11px 16px;font-weight:700;transition:transform .08s ease,background .15s ease}
+    button:hover{background:var(--soft)}button:active{transform:translateY(1px)}button.primary{background:var(--accent);color:white;border-color:var(--accent)}button.primary:hover{background:#2a2a2a}
+    .status{min-height:24px;font-size:.9rem;color:var(--muted);margin-top:-4px;margin-bottom:14px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .panel-head{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line);background:#fbfaf7}
+    .panel-head h2{margin:0;font-size:1rem;font-weight:700}.count{font-size:.82rem;color:var(--muted);white-space:nowrap}
+    textarea{display:block;width:100%;min-height:420px;resize:vertical;border:0;outline:0;padding:20px;background:transparent;color:var(--text);font:1rem/1.65 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+    textarea::placeholder{color:#aaa69c}
+    .rich-output{display:block;width:100%;min-height:420px;overflow:auto;border:0;outline:0;padding:20px;background:transparent;color:var(--text);font:1rem/1.65 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+    .rich-output:empty::before{content:attr(data-placeholder);color:#aaa69c}
+    .rejected{color:var(--text);text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--text)}
+    .correction{color:var(--red);font-weight:900;text-transform:uppercase}
+    .legend{margin-top:22px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .legend-item{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 15px}
+    .legend-symbol{font-size:1.1rem;margin-bottom:7px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .legend-title{font-weight:750;margin-bottom:2px}.legend-desc{color:var(--muted);font-size:.9rem}
+    details{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+    summary{cursor:pointer;font-weight:700}.note{color:var(--muted);font-size:.92rem;margin:10px 0 0}
+    code{background:var(--soft);border-radius:6px;padding:2px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .concept{margin-top:54px;border-top:1px solid var(--line);padding-top:22px}.concept h2{font-size:clamp(1.8rem,4vw,3rem);letter-spacing:-.04em;margin:0 0 20px}.concept .prose{max-width:840px}.concept .prose p{margin:0 0 1.2em}.concept .prose em{font-family:Georgia,serif}
+    footer{margin-top:26px;color:var(--muted);font-size:.84rem}
+    @media(max-width:820px){.grid{grid-template-columns:1fr}.legend{grid-template-columns:1fr}.rich-output,textarea{min-height:300px}}
+    @media(max-width:520px){.wrap{width:min(100% - 20px,1120px);padding-top:24px}.controls{align-items:stretch}button{width:100%}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <nav class="ein-nav" aria-label="Navegação EIN"><a href="../index.html">← EIN</a></nav>
+
+  <header>
+    <div class="eyebrow">Cucalimguistica · EIN · correção visível</div>
+    <h1>Correção à vista</h1>
+    <p class="intro">Escreva a correção no próprio texto. Use <code>(forma)#(correção)</code> para substituições, <code>#(inserção)</code> para acréscimos e <code>(remoção)#</code> para cortes. O que é retirado permanece tachado em preto; o que a norma acrescenta entra em vermelho, negrito e maiúsculas.</p>
+  </header>
+
+  <section class="controls" aria-label="Controles">
+    <button class="primary" id="convertBtn">Converter</button>
+    <button id="copyBtn">Copiar resultado</button>
+    <button id="clearBtn">Limpar</button>
+  </section>
+
+  <div class="status" id="status" aria-live="polite"></div>
+
+  <section class="grid">
+    <article class="panel">
+      <div class="panel-head">
+        <h2>Texto com correções</h2>
+        <span class="count" id="sourceCount">0 correções</span>
+      </div>
+      <textarea id="source" spellcheck="true" placeholder="Exemplos:\n\npara (mim)#(eu) fazer\ne(s)#(t)e exemplo\npropõe#(m)-se formas\n(retirar isto)# do texto"></textarea>
+    </article>
+
+    <article class="panel">
+      <div class="panel-head">
+        <h2>Correção à vista</h2>
+        <span class="count" id="outputCount">0 intervenções</span>
+      </div>
+      <div id="output" class="rich-output" role="textbox" aria-readonly="true" data-placeholder="O resultado aparecerá aqui."></div>
+    </article>
+  </section>
+
+  <section class="legend" aria-label="Legenda">
+    <div class="legend-item">
+      <div class="legend-symbol">para <span class="rejected">mim</span> <span class="correction">EU</span> fazer</div>
+      <div class="legend-title">Substituição</div>
+      <div class="legend-desc"><code>(mim)#(eu)</code>: a forma retirada continua visível; a correção entra de modo ostensivo.</div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-symbol">propõe<span class="correction">M</span>-se formas</div>
+      <div class="legend-title">Inserção</div>
+      <div class="legend-desc"><code>#(m)</code>: apenas o material acrescentado pela correção é destacado.</div>
+    </div>
+    <div class="legend-item">
+      <div class="legend-symbol"><span class="rejected">retirar isto</span> do texto</div>
+      <div class="legend-title">Remoção</div>
+      <div class="legend-desc"><code>(retirar isto)#</code>: aquilo que a normalização apaga permanece legível como vestígio.</div>
+    </div>
+  </section>
+
+  <details>
+    <summary>Como usar</summary>
+    <p class="note"><strong>Substituição:</strong> <code>(forma)#(correção)</code>. Ex.: <code>para (mim)#(eu) fazer</code>.</p>
+    <p class="note"><strong>Inserção:</strong> <code>#(texto)</code>. Ex.: <code>propõe#(m)-se formas</code>.</p>
+    <p class="note"><strong>Remoção:</strong> <code>(texto)#</code>. Ex.: <code>(palavra)# restante</code>.</p>
+    <p class="note">A conversão é determinística: não há intensidade nem “nova variação”. Aqui, o autor já decidiu exatamente qual forma permanece como vestígio e qual correção deve aparecer.</p>
+    <p class="note">O conversor não interpreta gramática. Ele apenas materializa as correções que você marcou. Parênteses internos aos trechos marcados não são suportados nesta primeira versão.</p>
+    <p class="note">O processamento ocorre integralmente no navegador. Nada é enviado para um servidor.</p>
+  </details>
+
+  <section class="concept" id="sobre">
+    <h2>Correção à vista</h2>
+    <div class="prose">
+      <p><strong>Correção à vista</strong> parte de um processo normalmente apagado do texto final. Uma forma é escrita, identificada como inadequada à norma-padrão, corrigida e substituída; depois disso, o leitor costuma receber apenas o produto normalizado. A intervenção conserva esse percurso na superfície da escrita. O que a correção remove permanece visível por meio do tachado; aquilo que ela insere ou substitui aparece em vermelho, negrito e maiúsculas. A forma-padrão pode continuar presente, mas já não chega ao texto sem deixar exposto o trabalho que foi necessário para produzi-la.</p>
+
+      <p>Não se trata de reproduzir um sistema editorial de revisão nem de oferecer outra convenção obrigatória de correção. O procedimento usa recursos gráficos já reconhecíveis — apagamento, destaque, cor, maiúsculas — para transformar a normalização linguística em acontecimento visível. O tachado registra aquilo que seria eliminado; a correção se apresenta de maneira deliberadamente mais ruidosa. Quando a mudança normativa acrescenta apenas uma letra, é essa letra que pode receber o destaque; quando exige substituir uma palavra ou uma construção inteira, a extensão da intervenção cresce na própria página.</p>
+
+      <p>Essa diferença de extensão importa. A escrita padronizada tende a mostrar apenas o resultado, tornando equivalentes correções que exigiram operações muito distintas. Em <em>Correção à vista</em>, o leitor pode ver quanto foi retirado, acrescentado ou reconstruído para que uma forma chegasse ao estado prescrito. A intervenção não mede cientificamente o “custo” de uma regra, mas impede que esse trabalho desapareça depois de realizado. A correção deixa de apagar seus próprios rastros.</p>
+
+      <p>O procedimento também não pressupõe que toda forma inicialmente escrita seja espontânea, brasileira, legítima em qualquer contexto ou socialmente equivalente a qualquer outra. Assim como nas demais práticas de EIN, contexto importa. Uma divergência pouco percebida num artigo, uma construção fortemente estigmatizada, uma exigência editorial explícita e uma atividade cujo objetivo é avaliar domínio da norma não produzem as mesmas condições de uso. <em>Correção à vista</em> não elimina essas diferenças; permite que o texto mostre que houve uma escolha, uma substituição e uma relação de força entre formas concorrentes.</p>
+
+      <p>No espaço acadêmico, a intervenção ocupa uma posição intermediária. Diferentemente de <em>Marcar a norma</em>, ela faz a alternativa excluída comparecer materialmente no texto. Diferentemente de <em>Escrever brasileiro</em>, porém, a forma prescrita também permanece visível como resultado da correção. O texto satisfaz parcialmente a expectativa normativa ao mesmo tempo que recusa o desaparecimento daquilo que essa expectativa substituiu. A página passa a conter não apenas uma frase, mas também a história de sua normalização.</p>
+
+      <p>Por isso, a prática pode ser usada de maneira seletiva. Não é necessário transformar cada correção possível em espetáculo gráfico. Pode-se escolher pontos em que a diferença entre a forma produzida e a forma exigida seja particularmente reveladora, ou deixar que uma revisão ordinária indique onde a norma pediu intervenção. O objetivo não é dificultar indefinidamente a leitura, mas tornar observável aquilo que a edição convencional costuma tornar invisível.</p>
+
+      <p><em>Correção à vista</em> conserva, assim, duas coisas que normalmente não permanecem juntas: a forma recusada e a forma autorizada. Uma não precisa desaparecer para que a outra seja lida. Ao manter ambas na página, a intervenção desloca a correção de uma operação silenciosa de limpeza para um objeto de observação. O texto corrigido continua circulando, mas a correção circula com ele.</p>
+    </div>
+  </section>
+
+  <footer>A correção deixa de apagar seus rastros.</footer>
+</main>
+
+<script>
+  const source = document.getElementById('source');
+  const output = document.getElementById('output');
+  const statusEl = document.getElementById('status');
+  const sourceCount = document.getElementById('sourceCount');
+  const outputCount = document.getElementById('outputCount');
+
+  let lastHtml = '';
+  let lastPlain = '';
+  let lastCount = 0;
+
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, ch => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+    })[ch]);
+  }
+
+  function countCorrections(text) {
+    const replacement = /\([^()]*\)#\([^()]*\)/g;
+    const insertion = /#\([^()]*\)/g;
+    const deletion = /\([^()]*\)#/g;
+    const used = text.match(replacement) || [];
+    let stripped = text.replace(replacement, '');
+    return used.length + (stripped.match(insertion)||[]).length + (stripped.match(deletion)||[]).length;
+  }
+
+  function convertText(text) {
+    let html = '';
+    let plain = '';
+    let count = 0;
+    let i = 0;
+
+    while (i < text.length) {
+      // Replacement: (old)#(new)
+      if (text[i] === '(') {
+        const closeOld = text.indexOf(')', i + 1);
+        if (closeOld !== -1 && text[closeOld + 1] === '#') {
+          if (text[closeOld + 2] === '(') {
+            const closeNew = text.indexOf(')', closeOld + 3);
+            if (closeNew !== -1) {
+              const oldText = text.slice(i + 1, closeOld);
+              const newText = text.slice(closeOld + 3, closeNew);
+              html += `<span class="rejected" style="color:#191919;text-decoration:line-through;text-decoration-thickness:2px;">${escapeHtml(oldText)}</span><span class="correction" style="color:#c1121f;font-weight:900;text-transform:uppercase;">${escapeHtml(newText.toUpperCase())}</span>`;
+              plain += `~~${oldText}~~ ${newText.toUpperCase()}`;
+              count++;
+              i = closeNew + 1;
+              continue;
+            }
+          }
+          // Deletion: (old)#
+          const oldText = text.slice(i + 1, closeOld);
+          html += `<span class="rejected" style="color:#191919;text-decoration:line-through;text-decoration-thickness:2px;">${escapeHtml(oldText)}</span>`;
+          plain += `~~${oldText}~~`;
+          count++;
+          i = closeOld + 2;
+          continue;
+        }
+      }
+
+      // Insertion: #(new)
+      if (text[i] === '#' && text[i + 1] === '(') {
+        const closeNew = text.indexOf(')', i + 2);
+        if (closeNew !== -1) {
+          const newText = text.slice(i + 2, closeNew);
+          html += `<span class="correction" style="color:#c1121f;font-weight:900;text-transform:uppercase;">${escapeHtml(newText.toUpperCase())}</span>`;
+          plain += newText.toUpperCase();
+          count++;
+          i = closeNew + 1;
+          continue;
+        }
+      }
+
+      const ch = text[i];
+      html += ch === '\n' ? '<br>' : escapeHtml(ch);
+      plain += ch;
+      i++;
+    }
+
+    return { html, plain, count };
+  }
+
+  function render() {
+    const result = convertText(source.value);
+    lastHtml = result.html;
+    lastPlain = result.plain;
+    lastCount = result.count;
+    output.innerHTML = lastHtml;
+    outputCount.textContent = `${lastCount} ${lastCount === 1 ? 'intervenção' : 'intervenções'}`;
+    statusEl.textContent = lastCount
+      ? `Conversão concluída: ${lastCount} ${lastCount === 1 ? 'correção visível' : 'correções visíveis'}.`
+      : 'Nenhuma marca de correção foi encontrada.';
+  }
+
+  function updateCount() {
+    const n = countCorrections(source.value);
+    sourceCount.textContent = `${n} ${n === 1 ? 'correção' : 'correções'}`;
+  }
+
+  async function copyResult() {
+    if (!lastHtml) {
+      statusEl.textContent = 'Ainda não há resultado para copiar.';
+      return;
+    }
+
+    if (navigator.clipboard && window.ClipboardItem) {
+      try {
+        const htmlDoc = `<div style="white-space:pre-wrap;font-family:Arial,sans-serif;line-height:1.5;color:#191919">${lastHtml}</div>`;
+        const item = new ClipboardItem({
+          'text/html': new Blob([htmlDoc], {type:'text/html'}),
+          'text/plain': new Blob([lastPlain], {type:'text/plain'})
+        });
+        await navigator.clipboard.write([item]);
+        statusEl.textContent = 'Resultado copiado com formatação rica.';
+        return;
+      } catch (err) {
+        console.warn('Falha na cópia rica.', err);
+      }
+    }
+
+    try {
+      const range = document.createRange();
+      range.selectNodeContents(output);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      const ok = document.execCommand('copy');
+      selection.removeAllRanges();
+      if (ok) {
+        statusEl.textContent = 'Resultado copiado com a formatação disponível no navegador.';
+        return;
+      }
+    } catch (err) {
+      console.warn('Falha na cópia por seleção.', err);
+    }
+
+    try {
+      await navigator.clipboard.writeText(lastPlain);
+      statusEl.textContent = 'O navegador não permitiu a cópia rica; foi copiada uma versão em texto simples.';
+    } catch (err) {
+      statusEl.textContent = 'Não foi possível copiar automaticamente. Selecione o resultado manualmente.';
+    }
+  }
+
+  document.getElementById('convertBtn').addEventListener('click', render);
+  document.getElementById('copyBtn').addEventListener('click', copyResult);
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    source.value = '';
+    output.innerHTML = '';
+    lastHtml = '';
+    lastPlain = '';
+    lastCount = 0;
+    updateCount();
+    outputCount.textContent = '0 intervenções';
+    statusEl.textContent = '';
+    source.focus();
+  });
+  source.addEventListener('input', updateCount);
+  source.addEventListener('keydown', event => {
+    if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+      event.preventDefault();
+      render();
+    }
+  });
+
+  updateCount();
+</script>
+</body>
+</html>
